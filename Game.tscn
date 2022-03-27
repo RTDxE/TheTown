@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=2]
+[gd_scene load_steps=34 format=2]
 
 [ext_resource path="res://Scripts/Main.gd" type="Script" id=1]
 [ext_resource path="res://Themes/Base.tres" type="Theme" id=2]
@@ -11,8 +11,8 @@
 [ext_resource path="res://Images/market.png" type="Texture" id=9]
 [ext_resource path="res://Images/ButtonLeftSmal.png" type="Texture" id=10]
 [ext_resource path="res://Images/Button.png" type="Texture" id=11]
-[ext_resource path="res://Sound/coin.wav" type="AudioStream" id=12]
-[ext_resource path="res://Sound/victory.wav" type="AudioStream" id=13]
+[ext_resource path="res://Sound/coins.wav" type="AudioStream" id=12]
+[ext_resource path="res://Sound/complete.wav" type="AudioStream" id=13]
 [ext_resource path="res://Sound/tap_on_buttons.wav" type="AudioStream" id=14]
 [ext_resource path="res://Sound/starting_to_pull.wav" type="AudioStream" id=15]
 [ext_resource path="res://Sound/building.wav" type="AudioStream" id=16]
@@ -23,7 +23,7 @@
 [ext_resource path="res://Images/meta2.png" type="Texture" id=21]
 [ext_resource path="res://Images/meta3.png" type="Texture" id=22]
 [ext_resource path="res://Scenes/Message.tscn" type="PackedScene" id=23]
-[ext_resource path="res://Fonts/Base.tres" type="DynamicFont" id=24]
+[ext_resource path="res://Fonts/MontserratAlternates-Thin.ttf" type="DynamicFontData" id=24]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends ViewportContainer
@@ -36,6 +36,89 @@ func _gui_input(event: InputEvent) -> void:
 	$Viewport.unhandled_input(event)
 "
 
+[sub_resource type="DynamicFont" id=11]
+size = 40
+font_data = ExtResource( 24 )
+
+[sub_resource type="GDScript" id=12]
+script/source = "extends Label
+
+func _on_Time_visibility_changed():
+	if visible:
+		$AnimationPlayer.play(\"Show\")
+"
+
+[sub_resource type="Animation" id=13]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ) ]
+}
+
+[sub_resource type="Animation" id=14]
+resource_name = "Show"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=2]
+resource_name = "Punch"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:rect_scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ), Vector2( 1.05, 1.05 ), Vector2( 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=3]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:rect_scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ) ]
+}
+
+[sub_resource type="StyleBoxEmpty" id=10]
+
+[sub_resource type="Theme" id=9]
+HScrollBar/styles/grabber = SubResource( 10 )
+HScrollBar/styles/grabber_highlight = SubResource( 10 )
+HScrollBar/styles/grabber_pressed = SubResource( 10 )
+HScrollBar/styles/scroll = SubResource( 10 )
+HScrollBar/styles/scroll_focus = SubResource( 10 )
+
 [node name="Game" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -46,7 +129,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 viewport = NodePath("GameWindow/Viewport")
-viewers = NodePath("Buttons/Viewers")
+viewers = NodePath("Buttons/ScrollContainer/Viewers")
 
 [node name="TextureRect" type="TextureRect" parent="."]
 anchor_right = 1.0
@@ -54,20 +137,6 @@ anchor_bottom = 1.0
 mouse_filter = 2
 texture = ExtResource( 3 )
 expand = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Time" type="Label" parent="."]
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -206.491
-margin_top = 16.2108
-margin_right = -78.491
-margin_bottom = 49.2108
-custom_fonts/font = ExtResource( 24 )
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-text = "00:00"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -86,20 +155,144 @@ __meta__ = {
 size = Vector2( 400, 700 )
 transparent_bg = true
 handle_input_locally = false
-msaa = 1
 render_target_update_mode = 3
 
-[node name="Sound" type="TextureRect" parent="."]
-anchor_left = 1.0
-anchor_right = 1.0
+[node name="Level" type="Label" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
 margin_left = -64.0
-margin_top = 52.9322
-margin_bottom = 116.932
+margin_top = 24.0
+margin_right = 64.0
+margin_bottom = 74.0
+custom_colors/font_color = Color( 0.498039, 0.8, 1, 1 )
+custom_colors/font_color_shadow = Color( 0.364706, 0.517647, 0.713726, 1 )
+custom_constants/shadow_offset_x = 2
+custom_constants/shadow_offset_y = 2
+custom_constants/shadow_as_outline = 0
+text = "Level 1"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Time" type="Label" parent="."]
+modulate = Color( 1, 1, 1, 0 )
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -64.0
+margin_top = 68.0
+margin_right = 64.0
+margin_bottom = 118.0
+custom_colors/font_color = Color( 0.627451, 0.627451, 0.627451, 1 )
+custom_fonts/font = SubResource( 11 )
+text = "00:00"
+align = 1
+valign = 1
+script = SubResource( 12 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Time"]
+anims/RESET = SubResource( 13 )
+anims/Show = SubResource( 14 )
+
+[node name="Money" type="Control" parent="."]
+margin_top = 15.0678
+margin_right = 164.0
+margin_bottom = 79.0678
+rect_min_size = Vector2( 164, 64 )
+rect_pivot_offset = Vector2( 0, 32 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="TextureRect" parent="Money"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -2.0
+margin_right = -57.0
+rect_min_size = Vector2( 96, 64 )
+texture = ExtResource( 11 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Count" type="Label" parent="Money/Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 6.0
+margin_top = 2.0
+margin_right = -22.0
+margin_bottom = 2.0
+text = "0"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="Money"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 80.0
+margin_top = 8.0
+margin_right = -36.0
+margin_bottom = -8.0
+rect_min_size = Vector2( 48, 48 )
+texture = ExtResource( 6 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Money"]
+anims/Punch = SubResource( 2 )
+anims/RESET = SubResource( 3 )
+
+[node name="Market" type="TextureRect" parent="."]
+margin_top = 79.0678
+margin_right = 64.0
+margin_bottom = 143.068
 rect_min_size = Vector2( 64, 64 )
 size_flags_horizontal = 10
 texture = ExtResource( 5 )
 expand = true
 stretch_mode = 6
+flip_h = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureButton" type="TextureButton" parent="Market"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 11.8781
+margin_top = 12.9322
+margin_right = -12.1219
+margin_bottom = -11.0678
+texture_normal = ExtResource( 9 )
+expand = true
+stretch_mode = 5
+flip_h = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Sound" type="TextureRect" parent="."]
+margin_top = 134.0
+margin_right = 64.0
+margin_bottom = 198.0
+rect_min_size = Vector2( 64, 64 )
+size_flags_horizontal = 10
+texture = ExtResource( 5 )
+expand = true
+stretch_mode = 6
+flip_h = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -121,111 +314,19 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Panel" type="HBoxContainer" parent="."]
+[node name="Again" type="TextureRect" parent="."]
+anchor_left = 1.0
 anchor_right = 1.0
-margin_bottom = 64.0
-mouse_filter = 2
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Money" type="Control" parent="Panel"]
-margin_right = 164.0
-margin_bottom = 64.0
-rect_min_size = Vector2( 164, 64 )
-
-[node name="Panel" type="TextureRect" parent="Panel/Money"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 55.0
-margin_right = -1.52588e-05
-rect_min_size = Vector2( 96, 64 )
-texture = ExtResource( 11 )
-expand = true
-stretch_mode = 6
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Count" type="Label" parent="Panel/Money/Panel"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_top = 2.0
-margin_bottom = 2.0
-text = "0"
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="TextureRect" type="TextureRect" parent="Panel/Money"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_right = -98.0
-rect_min_size = Vector2( 64, 64 )
-texture = ExtResource( 6 )
-expand = true
-stretch_mode = 6
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Market" type="TextureRect" parent="Panel"]
-margin_left = 336.0
-margin_right = 400.0
-margin_bottom = 64.0
-rect_min_size = Vector2( 64, 64 )
-size_flags_horizontal = 10
-texture = ExtResource( 5 )
-expand = true
-stretch_mode = 6
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="TextureButton" type="TextureButton" parent="Panel/Market"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 11.8781
-margin_top = 12.9322
-margin_right = -12.1219
-margin_bottom = -11.0678
-texture_normal = ExtResource( 9 )
-expand = true
-stretch_mode = 5
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Buttons" type="HBoxContainer" parent="."]
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_top = -163.0
-margin_bottom = -5.0
-rect_clip_content = true
-mouse_filter = 2
-size_flags_vertical = 10
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Buttons" type="VBoxContainer" parent="Buttons"]
-margin_right = 64.0
-margin_bottom = 158.0
-alignment = 1
-
-[node name="Again" type="TextureRect" parent="Buttons/Buttons"]
-margin_top = 13.0
-margin_right = 64.0
-margin_bottom = 77.0
+margin_left = -64.0
+margin_top = 14.0
+margin_bottom = 78.0
 rect_min_size = Vector2( 64, 64 )
 texture = ExtResource( 10 )
 expand = true
 stretch_mode = 6
+flip_h = true
 
-[node name="Again" type="TextureButton" parent="Buttons/Buttons/Again"]
+[node name="Again" type="TextureButton" parent="Again"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 11.0
@@ -239,16 +340,19 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="TextureRect2" type="TextureRect" parent="Buttons/Buttons"]
-margin_top = 81.0
-margin_right = 64.0
-margin_bottom = 145.0
+[node name="Settings" type="TextureRect" parent="."]
+visible = false
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -64.0
+margin_top = 203.0
+margin_bottom = 267.0
 rect_min_size = Vector2( 64, 64 )
 texture = ExtResource( 10 )
 expand = true
 stretch_mode = 6
 
-[node name="Settings" type="TextureButton" parent="Buttons/Buttons/TextureRect2"]
+[node name="Settings" type="TextureButton" parent="Settings"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 11.0
@@ -262,10 +366,30 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Viewers" type="HBoxContainer" parent="Buttons"]
-margin_left = 68.0
-margin_right = 68.0
-margin_bottom = 158.0
+[node name="Buttons" type="Control" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 12.0
+margin_top = -163.0
+margin_right = -12.0
+margin_bottom = -8.0
+rect_clip_content = true
+mouse_filter = 2
+size_flags_vertical = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Buttons"]
+anchor_right = 1.0
+margin_bottom = 155.0
+rect_min_size = Vector2( 0, 155 )
+theme = SubResource( 9 )
+follow_focus = true
+scroll_vertical_enabled = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Viewers" type="HBoxContainer" parent="Buttons/ScrollContainer"]
 rect_clip_content = true
 
 [node name="Back" type="AudioStreamPlayer" parent="."]
@@ -363,10 +487,12 @@ pause_mode = 2
 
 [node name="Message" parent="." instance=ExtResource( 23 )]
 visible = false
+
 [connection signal="resized" from="." to="." method="resized"]
+[connection signal="visibility_changed" from="Time" to="Time" method="_on_Time_visibility_changed"]
+[connection signal="pressed" from="Market/TextureButton" to="." method="show_show"]
 [connection signal="toggled" from="Sound/Sound" to="." method="toggle_sound"]
-[connection signal="pressed" from="Panel/Market/TextureButton" to="." method="show_show"]
-[connection signal="pressed" from="Buttons/Buttons/Again/Again" to="." method="reload"]
-[connection signal="pressed" from="Buttons/Buttons/TextureRect2/Settings" to="." method="settings"]
+[connection signal="pressed" from="Again/Again" to="." method="reload"]
+[connection signal="pressed" from="Settings/Settings" to="." method="settings"]
 [connection signal="gui_input" from="CloseController" to="." method="should_close"]
 [connection signal="tween_all_completed" from="ShopTween" to="." method="shop_change"]

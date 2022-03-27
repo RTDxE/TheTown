@@ -12,6 +12,6 @@ func _gui_input(event: InputEvent) -> void:
 
 func init():
 	if building:
-		get_node(building).rotate_y(deg2rad(angle))
+		get_node(building).get_parent().rotate_y(deg2rad(angle))
 
 		Helper.set_mats(get_node(building), colors)

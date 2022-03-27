@@ -31,6 +31,7 @@ func load_level(i=-1):
 		v.init()
 	game = res.scene
 	game.time = $Time
+	game.time.visible = false
 	get_node(viewport).add_child(game)
 	game.viewers = get_node(viewers)
 	if "lines" in res:
@@ -55,7 +56,10 @@ func add_money(c):
 	update_money()
 
 func update_money():
-	$Panel/Money/Panel/Count.text = str(int(money))
+	$Money/Panel/Count.text = str(int(money))
+	$Money/AnimationPlayer.stop(true)
+	$Money/AnimationPlayer.play("Punch")
+
 
 
 
@@ -65,10 +69,13 @@ func next_level():
 		print("End of game, level 1")
 		Levels.current_level = 1
 	load_level()
+	
+	print("next level ", Levels.current_level)
 
 func reload() -> void:
 	game.is_dragging = false
 	load_level()
+	print("reload level ", Levels.current_level)
 
 
 func settings() -> void:

@@ -17,7 +17,7 @@ var click = 0
 var last_pos : Vector3
 const particles_inst = preload("res://Scenes/Monets.tscn")
 var game_started = false
-var game_time = 0
+var game_time = 1
 var figures_count = 0
 var lines = {}
 var camera_zoom = 1
@@ -138,6 +138,7 @@ func win():
 		is_win = is_win and lines[line] <= count_lines(line)
 	game_started = false
 	if is_win:
+		emit_signal("sound", "Win")
 		var frases = []
 		var x = 1
 		var f_place_time = figures_count + 2
@@ -161,13 +162,13 @@ func win():
 
 			particles.fire(price*x)
 			emit_signal("add_money", price*x)
-			emit_signal("sound", "Coins")
+#			emit_signal("sound", "Coins")
 			var t = get_tree().create_timer(0.2)
 			yield(t, "timeout")
 
 		for p in particles_arr:
 			p.queue_free()
-		emit_signal("sound", "Win")
+		
 		var t = get_tree().create_timer(1.0)
 		yield(t, "timeout")
 		emit_signal("win")
@@ -237,6 +238,8 @@ func _unhandled_input(event):
 
 		if event.pressed:
 			game_started = true
+			time.visible = true
+			
 			if selected:
 				var result = pick(4) # Floor
 				if result:
@@ -307,6 +310,9 @@ func check(force=null):
 	if force:
 		force.can_build = can_build(force)
 		force.update_markers(markers)
+		for m in markers:
+			var p = terrain.world_to_map((m as Spatial).translation)
+			(m as Spatial).translation = terrain.map_to_world(p.x, p.y, p.z)
 		force.stop()
 		if force.can_build:
 			force.down()

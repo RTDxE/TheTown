@@ -86,15 +86,21 @@ func stop():
 	$Visual.translation = Vector3(0,base_y,0)
 	if $AnimationPlayer.is_playing() and $AnimationPlayer.current_animation == "Prepare":
 		$AnimationPlayer.stop()
+		
 	$Visual.rotation = Vector3(0,0,0)
 	state = STATE.UP if not can_build else STATE.DOWN
+
 func start():
-	translation.y = 2
+	translation.y = 1
 	$AnimationPlayer.play("Start")
 
 func build():
 	collision_layer= 0
 	if not decor:
+		if ($AnimationPlayer.is_playing()):
+			$AnimationPlayer.playback_speed = 3
+			yield($AnimationPlayer, "animation_finished")
+			$AnimationPlayer.playback_speed = 1
 		$AnimationPlayer.play("Build")
 		state = STATE.BUILT
 		var t = get_tree().create_timer(0.3)

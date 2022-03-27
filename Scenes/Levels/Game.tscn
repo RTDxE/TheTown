@@ -21,7 +21,7 @@ __meta__ = {
 }
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( 0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 6.66343, 8.0011, 6.70882 )
+transform = Transform( 0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 6.663, 9.5, 6.709 )
 keep_aspect = 0
 projection = 1
 current = true
@@ -33,9 +33,9 @@ far = 200.0
 [node name="Markers" type="Spatial" parent="."]
 
 [node name="Floor" type="StaticBody" parent="."]
-input_capture_on_drag = true
 collision_layer = 4
 collision_mask = 4
+input_capture_on_drag = true
 
 [node name="CollisionPolygon" type="CollisionPolygon" parent="Floor"]
 transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, -0.257294, 0 )

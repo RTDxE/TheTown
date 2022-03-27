@@ -7,10 +7,6 @@
 data = PoolVector3Array( -1, 1, 1, 1, 1, 1, -1, -1, 1, 1, 1, 1, 1, -1, 1, -1, -1, 1, 1, 1, -1, -1, 1, -1, 1, -1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, 1, 1, 1, 1, 1, -1, 1, -1, 1, 1, 1, -1, 1, -1, -1, 1, -1, 1, -1, 1, -1, -1, 1, 1, -1, -1, -1, -1, 1, 1, -1, -1, 1, -1, -1, -1, 1, 1, 1, -1, 1, 1, 1, 1, -1, -1, 1, 1, -1, 1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1, -1, -1, -1, 1, -1, 1, 1, -1, -1, -1, -1, -1 )
 
 [node name="House" instance=ExtResource( 1 )]
-Ray0 = NodePath("Rays/RayCast2")
-Ray1 = NodePath("Rays/RayCast")
-Ray2 = NodePath("Rays/RayCast2")
-Ray3 = NodePath("")
 
 [node name="house4" parent="Visual" index="0" instance=ExtResource( 2 )]
 
