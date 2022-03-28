@@ -13,6 +13,7 @@ var camera
 var markers = []
 var field = {}
 var viewers : HBoxContainer
+var selected_house_viewer
 var click = 0
 var last_pos : Vector3
 const particles_inst = preload("res://Scenes/Monets.tscn")
@@ -22,6 +23,7 @@ var figures_count = 0
 var lines = {}
 var camera_zoom = 1
 var time
+
 func init():
 	if has_node("DirectionalLight"):
 		$DirectionalLight.shadow_enabled = !OS.has_feature('JavaScript')
@@ -42,9 +44,8 @@ func init():
 	for d in $Decor.get_children():
 		d.decor = true
 		build(d)
-#	if viewers.get_child_count() > 0:
-#	for i in viewers.get_child_count():
-#		viewers.get_child(i).connect("pressed", self, "viewer_tap", [viewers.get_child(i)])
+	for i in viewers.get_child_count():
+		viewers.get_child(i).connect("pick_building", self, "house_built")
 	house_built()
 	time.text = "00:00"
 
@@ -95,26 +96,38 @@ func pick(mask=1):
 	var space_state = get_world().direct_space_state
 	return space_state.intersect_ray(from, to, [], mask)
 
-func house_built():
+func house_built(idx = -1):
+	if selected != null:
+		selected.queue_free()
 	if  $Houses.get_child_count() > 0:
 		emit_signal("sound", "Build")
+	if selected_house_viewer != null:
+		if idx >= 0:
+			selected_house_viewer.selected = false
+		else:
+			selected_house_viewer.queue_free()
+			yield(get_tree(), "idle_frame")
+			yield(get_tree(), "idle_frame")
 	if viewers.get_child_count() == 0:
 		print("Win!")
 		return win()
-	var next = viewers.get_child(0)
-	var house : House = next.house.instance()
+	if idx < 0:
+		selected_house_viewer = viewers.get_child(0)
+	else: 
+		selected_house_viewer = viewers.get_child(idx)
+	selected_house_viewer.selected = true
+	var house : House = selected_house_viewer.house.instance()
 	house.decor = false
 	$Houses.add_child(house)
-	house.rotate_y(deg2rad(next.angle))
+	house.rotate_y(deg2rad(selected_house_viewer.angle))
 	update_markers(house.markers_count())
 	to_grid(house, Vector3(0,0,0))
 	check(house)
 	house.connect("build", self, "build")
 	house.connect("built", self, "house_built")
 	house.start()
-	house.set_colors(next.colors)
+	house.set_colors(selected_house_viewer.colors)
 	selected = house
-	next.queue_free()
 
 func _ready() -> void:
 	camera_zoom = $Camera.size
@@ -173,6 +186,8 @@ func win():
 		yield(t, "timeout")
 		emit_signal("win")
 	else:
+		emit_signal("message", "Incorrect")
+		yield(get_tree().create_timer(1.0), "timeout")
 		emit_signal("restart")
 
 func count_lines(col):

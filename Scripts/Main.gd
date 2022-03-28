@@ -25,6 +25,8 @@ func load_level(i=-1):
 			v.get_parent().remove_child(v)
 			v.queue_free()
 
+	$Level.text = "Level " + str(i)
+	
 	var res = Levels.get_scene(i)
 	for v in res.buildings:
 		get_node(viewers).add_child(v)
@@ -36,6 +38,7 @@ func load_level(i=-1):
 	game.viewers = get_node(viewers)
 	if "lines" in res:
 		game.lines = res.lines
+	yield(get_tree().create_timer(0.15), "timeout")
 	game.init()
 	game.change_back(current_back)
 	game.connect("win", self, "next_level")
