@@ -1,2 +1,3 @@
 # TheTown
-Jam Game: The Town 
+Game based on original "The Town".
+Made for browser platforms (Yandex.Games, VK.Games, etc.) 
