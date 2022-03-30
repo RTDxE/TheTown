@@ -10,3 +10,5 @@ data_*/
 /killemall.keystore
 *.import
 *.blend1
+
+bin/
