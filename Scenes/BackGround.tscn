@@ -47,20 +47,20 @@ __meta__ = {
 }
 
 [node name="Build" type="Label" parent="."]
-visible = false
-anchor_left = 0.5
+anchor_left = 1.0
 anchor_top = 1.0
-anchor_right = 0.5
+anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -83.5
-margin_top = -49.0
-margin_right = 83.5
+margin_left = -160.0
+margin_top = -65.0
+margin_right = -8.0
+margin_bottom = -14.0
 custom_colors/font_color = Color( 0.843137, 0.984314, 1, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_as_outline = 1
 custom_fonts/font = ExtResource( 1 )
-text = "USE"
-align = 1
-valign = 1
+text = "SELECTED"
+align = 2
+valign = 2
 
 [connection signal="resized" from="." to="." method="resized"]

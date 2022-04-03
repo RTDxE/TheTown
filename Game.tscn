@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=2]
+[gd_scene load_steps=38 format=2]
 
 [ext_resource path="res://Scripts/Main.gd" type="Script" id=1]
 [ext_resource path="res://Themes/Base.tres" type="Theme" id=2]
@@ -147,67 +147,6 @@ HScrollBar/styles/grabber_highlight = SubResource( 10 )
 HScrollBar/styles/grabber_pressed = SubResource( 10 )
 HScrollBar/styles/scroll = SubResource( 10 )
 HScrollBar/styles/scroll_focus = SubResource( 10 )
-
-[sub_resource type="GDScript" id=16]
-script/source = "extends Node
-
-var _get_data_cb = JavaScript.create_callback(self, \"_apply_data\")
-var _set_data_cb = JavaScript.create_callback(self, \"_saved\")
-
-var _adv
-var _paltform
-var _game
-
-func _ready() -> void:
-	logger(\"Init SDK\")
-	InstantGamesBridge.initialize()
-	InstantGamesBridge.connect(\"initalized\", self, \"_initialized\")
-
-func _initialized() -> void:
-	logger(\"Initialized\")
-	_adv = InstantGamesBridge.advertisement
-	_paltform = InstantGamesBridge.platform
-	_game = InstantGamesBridge.game
-	logger(\"ID: \" + _paltform.id)
-	logger(\"Lang: \" + _paltform.language)
-	logger(\"Payload: \" + str(_paltform.payload))
-	
-	_adv.connect(\"interstitial_state_changed\", self, \"_adv_changed\")
-	_adv.connect(\"rewarded_state_changed\", self, \"_rew_changed\")
-	
-	_adv.showInterstitial(true)
-
-
-func _adv_changed(state: String):
-	logger(\"New Inter State: \" + state)
-	
-	if state == InterstitialState.Closed:
-		_adv.showRewarded()
-
-
-func _rew_changed(state: String):
-	logger(\"New Reward State: \" + state)
-	
-	if state == RewardState.Rewarded:
-		_game.setData(\"gold\", 100, _set_data_cb)
-		_game.setData(\"name\", \"John\", _set_data_cb)
-		
-		yield(get_tree().create_timer(1.0), \"timeout\")
-		
-		_game.getData(\"gold\", _get_data_cb)
-		_game.getData(\"name\", _get_data_cb)
-
-
-func _apply_data(args) -> void:
-	logger(\"Data given: \" + str(args[0]))
-
-
-func _saved(args) -> void:
-	logger(\"Data was saved\")
-
-func logger(text):
-	$logger.add_text(text + '\\n')
-"
 
 [node name="Game" type="Control"]
 anchor_right = 1.0
@@ -585,16 +524,6 @@ pause_mode = 2
 
 [node name="Message" parent="." instance=ExtResource( 23 )]
 visible = false
-
-[node name="InstantGameBridge" type="Node" parent="."]
-script = SubResource( 16 )
-
-[node name="logger" type="RichTextLabel" parent="InstantGameBridge"]
-visible = false
-anchor_right = 1.0
-anchor_bottom = 1.0
-custom_colors/default_color = Color( 0, 0, 0, 1 )
-bbcode_enabled = true
 
 [connection signal="resized" from="." to="." method="resized"]
 [connection signal="visibility_changed" from="Time" to="Time" method="_on_Time_visibility_changed"]

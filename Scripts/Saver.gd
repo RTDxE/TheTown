@@ -62,51 +62,74 @@ func load_data():
 	else:
 		_load_standalone()
 
+var _m_cb = JavaScript.create_callback(self, "_load_data_money")
+var _l_cb = JavaScript.create_callback(self, "_load_data_level")
+var _s_cb = JavaScript.create_callback(self, "_load_data_sound")
+var _b_cb = JavaScript.create_callback(self, "_load_data_backgrounds")
+var _c_cb = JavaScript.create_callback(self, "_load_data_current_back")
+
 func _load_web() -> void:
-	InstantGamesBridge.game.get_data("money", JavaScript.create_callback(self, "_load_data_money"))
-	InstantGamesBridge.game.get_data("level", JavaScript.create_callback(self, "_load_data_level"))
-	InstantGamesBridge.game.get_data("sound", JavaScript.create_callback(self, "_load_data_sound"))
-	InstantGamesBridge.game.get_data("backgrounds", JavaScript.create_callback(self, "_load_data_backgrounds"))
+	InstantGamesBridge.game.get_data("money", _m_cb)
+	InstantGamesBridge.game.get_data("level", _l_cb)
+	InstantGamesBridge.game.get_data("sound", _s_cb)
+	InstantGamesBridge.game.get_data("backgrounds", _b_cb)
 	
-	_l_pus(5)
+	_l_pus(4)
 
 func _load_data_money(args):
-	_money = int(args[0])
+	if args[0] == null:
+		_money = 0
+	else:
+		_money = int(args[0])
 	
 	_l_rel()
 
 func _load_data_level(args):
-	var l = int(args[0])
-	if l <= 0:
+	if args[0] == null:
 		_level = 1
 	else:
-		_level = l
+		var l = int(args[0])
+		if l <= 0:
+			_level = 1
+		else:
+			_level = l
 	
 	_l_rel()
 
 func _load_data_sound(args):
-	_sound = bool(args[0])
+	if args[0] == null:
+		_sound = true
+	else:
+		_sound = bool(args[0])
 	
 	_l_rel()
 
 func _load_data_backgrounds(args):
-	var raw_backs = str(args[0])
-	if raw_backs != "":
-		var backs = raw_backs.split(",", false)
-		_backgrounds = PoolStringArray(backs)
-	InstantGamesBridge.game.get_data("current_background", JavaScript.create_callback(self, "_load_data_current_back"))
+	if args[0] == null:
+		_backgrounds = PoolStringArray(["Back0"])
+	else:
+		var raw_backs = str(args[0])
+		if raw_backs != "":
+			var backs = raw_backs.split(",", false)
+			_backgrounds = PoolStringArray(backs)
+	
+	_l_pus()
+	InstantGamesBridge.game.get_data("current_background", _c_cb)
 	
 	_l_rel()
 
 func _load_data_current_back(args):
-	_current_background = _default_background
+	if args[0] == null:
+		_current_background = _default_background
+	else:
+		_current_background = _default_background
 	
-	var back = str(args[0])
-	if not back.empty():
-		for b in _backgrounds:
-			if b == back:
-				_current_background = back
-				break
+		var back = str(args[0])
+		if not back.empty():
+			for b in _backgrounds:
+				if b == back:
+					_current_background = back
+					break
 	
 	_l_rel()
 

@@ -11,7 +11,6 @@ export (String) var asset = ""
 func set_pursuased(b):
 	pursuased = b
 	$Money.visible = !b
-	$Build.visible = b
 
 func set_gold(b):
 	gold = b
@@ -23,6 +22,10 @@ func _ready() -> void:
 	
 	yield(Saver, "loaded")
 	set_pursuased(Array(Saver.backgrounds).has(asset))
+	update_status()
+
+func update_status():
+	$Build.visible = Saver.current_background == asset
 
 func resized() -> void:
 	print("resized")

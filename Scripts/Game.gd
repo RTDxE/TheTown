@@ -138,11 +138,11 @@ func resize():
 	for i in 3:
 		yield(get_tree().create_timer(0.1),"timeout")
 		var s  = get_viewport().size
-		if s.x > s.y * 0.8:
+		if s.x > s.y * 0.7:
 			$Camera.keep_aspect = Camera.KEEP_HEIGHT
 			$Camera.size = camera_zoom * 1.5
 		else:
-			$Camera.keep_aspect =   Camera.KEEP_WIDTH
+			$Camera.keep_aspect =  Camera.KEEP_WIDTH
 			$Camera.size = camera_zoom
 
 func win():

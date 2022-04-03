@@ -6,6 +6,7 @@ var _instant_games_bridge_interface
 
 var _initialized_cb = JavaScript.create_callback(self, "_on_initialized")
 var _printerr_cb = JavaScript.create_callback(self, "printerr")
+var _pass_cb = JavaScript.create_callback(self, "_pass"); func _pass(args): pass
 
 var isInitialized: bool setget , _is_initialized_getter
 func _is_initialized_getter() -> bool:

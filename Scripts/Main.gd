@@ -82,8 +82,6 @@ func update_money():
 	$Money/AnimationPlayer.play("Punch")
 
 
-
-
 func next_level():
 	Saver.level += 1
 	if Saver.level > Levels.levels.size():
@@ -155,6 +153,8 @@ func shop(c):
 		var a = Saver.backgrounds
 		a.append(c.asset)
 		Saver.backgrounds = a
+	
+	get_tree().call_group("shop_env", "update_status")
 
 
 var touched = false

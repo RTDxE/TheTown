@@ -30,11 +30,11 @@ func show_interstitial(ignore_delay = false, callback: JavaScriptObject = null, 
 		var options = JavaScript.create_object("Object")
 		options.ignoreDelay = ignore_delay
 		_interface.showInterstitial(options) \
-			.then(callback) \
-			.catch(catch_callback)
+			.then(InstantGamesBridge._pass_cb if callback == null else callback) \
+			.catch(InstantGamesBridge._pass_cb if catch_callback == null else catch_callback)
 
 func show_rewarded(callback: JavaScriptObject = null, catch_callback: JavaScriptObject = null) -> void:
 	if _interface != null:
 		_interface.showRewarded() \
-			.then(callback) \
-			.catch(catch_callback)
+			.then(InstantGamesBridge._pass_cb if callback == null else callback) \
+			.catch(InstantGamesBridge._pass_cb if catch_callback == null else catch_callback)
