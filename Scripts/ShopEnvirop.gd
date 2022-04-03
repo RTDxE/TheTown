@@ -20,6 +20,9 @@ func set_gold(b):
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	resized()
+	
+	yield(Saver, "loaded")
+	set_pursuased(Array(Saver.backgrounds).has(asset))
 
 func resized() -> void:
 	print("resized")

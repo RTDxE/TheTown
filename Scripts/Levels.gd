@@ -1,7 +1,5 @@
 extends Node
 
-var current_level = 1
-
 const levels = {
 	1: {
 		"scene": "3x2",

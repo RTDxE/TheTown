@@ -5,17 +5,35 @@ export (NodePath) var viewers
 
 signal swipe(s)
 var game = null
-var money = 0
-var current_back = "Back0"
-func _ready() -> void:
-	load_level()
 
+
+func _ready() -> void:
+	Saver.connect("loaded", self, "_init_game")
+	Saver.load_data()
+	
 	for c in get_tree().get_nodes_in_group("shop_env"):
 		c.connect("pressed", self, "shop", [c])
 
+
+func _init_game() -> void:
+	if InstantGamesBridge.isInitialized:
+		InstantGamesBridge.advertisement.connect("interstitial_state_changed", self, "_inter_changed")
+	
+	update_money()
+	load_level()
+
+
+func _inter_changed(state):
+	print("Inter state: ", state)
+	get_tree().paused = state == InterstitialState.OPENED
+
+
 func load_level(i=-1):
+	if InstantGamesBridge.isInitialized:
+		InstantGamesBridge.advertisement.show_interstitial()
+	
 	if i < 1:
-		i = Levels.current_level
+		i = Saver.level
 
 	# Clean up
 	if game and is_instance_valid(game):
@@ -40,7 +58,7 @@ func load_level(i=-1):
 		game.lines = res.lines
 	yield(get_tree().create_timer(0.15), "timeout")
 	game.init()
-	game.change_back(current_back)
+	game.change_back(Saver.current_background)
 	game.connect("win", self, "next_level")
 	game.connect("restart", self, "reload")
 	game.connect("add_money", self, "add_money")
@@ -55,11 +73,11 @@ func sound(s):
 	get_node(s).play()
 
 func add_money(c):
-	money += c
+	Saver.money += c
 	update_money()
 
 func update_money():
-	$Money/Panel/Count.text = str(int(money))
+	$Money/Panel/Count.text = str(int(Saver.money))
 	$Money/AnimationPlayer.stop(true)
 	$Money/AnimationPlayer.play("Punch")
 
@@ -67,28 +85,31 @@ func update_money():
 
 
 func next_level():
-	Levels.current_level += 1
-	if Levels.current_level > Levels.levels.size():
+	Saver.level += 1
+	if Saver.level > Levels.levels.size():
 		print("End of game, level 1")
-		Levels.current_level = 1
+		Saver.level = 1
 	load_level()
 	
-	print("next level ", Levels.current_level)
+	print("next level ", Saver.level)
 
-func reload() -> void:
+func reload(with_sound = false) -> void:
+	if with_sound:
+		sound("DoubleClick")
 	game.is_dragging = false
 	load_level()
-	print("reload level ", Levels.current_level)
+	print("reload level ", Saver.level)
 
 
 func settings() -> void:
 	game.is_dragging = false
-	pass # Replace with function body.
 
 
 func toggle_sound(b) -> void:
 	print("Audio")
-	game.is_dragging = false
+	if game != null:
+		game.is_dragging = false
+		Saver.sound = b
 	AudioServer.set_bus_mute(0, !b)
 
 # Swipe realization and shop
@@ -96,8 +117,9 @@ var shop_opened = false
 func show_show():
 	shop_opened = not shop_opened
 	if shop_opened:
-		print(			$Shop.rect_position.y)
-		print(			$Shop.rect_size.y)
+		print("shop pos: ", $Shop.rect_position.y)
+		print("shop size: ", $Shop.rect_size.y)
+		$Shop.rect_size.x = rect_size.x
 		$ShopTween.interpolate_property(
 			$Shop, "rect_position:y",
 			$Shop.rect_position.y,
@@ -124,12 +146,15 @@ func shop_change() -> void:
 
 func shop(c):
 	if c.pursuased:
-		current_back = c.asset
-		game.change_back(current_back)
-	elif c.gold <= money:
-		money -= c.gold
+		Saver.current_background = c.asset
+		game.change_back(Saver.current_background)
+	elif c.gold <= Saver.money:
+		Saver.money -= c.gold
 		update_money()
 		c.pursuased = true
+		var a = Saver.backgrounds
+		a.append(c.asset)
+		Saver.backgrounds = a
 
 
 var touched = false
@@ -196,7 +221,8 @@ func check_swipe():
 
 
 func resized() -> void:
-	$Shop.rect_position.y = get_viewport().size.y
+	pass
+#	$Shop.rect_position.y = get_viewport().size.y
 
 
 func should_close(event: InputEvent) -> void:
@@ -204,3 +230,4 @@ func should_close(event: InputEvent) -> void:
 
 		if shop_opened:
 			show_show()
+

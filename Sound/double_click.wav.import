@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/double_click.wav-ac9806a2bbdd533bc23566c9bffd1dfb.sample"
+
+[deps]
+
+source_file="res://Sound/double_click.wav"
+dest_files=[ "res://.import/double_click.wav-ac9806a2bbdd533bc23566c9bffd1dfb.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

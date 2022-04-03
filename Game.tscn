@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=2]
+[gd_scene load_steps=39 format=2]
 
 [ext_resource path="res://Scripts/Main.gd" type="Script" id=1]
 [ext_resource path="res://Themes/Base.tres" type="Theme" id=2]
@@ -24,6 +24,8 @@
 [ext_resource path="res://Images/meta3.png" type="Texture" id=22]
 [ext_resource path="res://Scenes/Message.tscn" type="PackedScene" id=23]
 [ext_resource path="res://Fonts/MontserratAlternates-Thin.ttf" type="DynamicFontData" id=24]
+[ext_resource path="res://Sound/lose.wav" type="AudioStream" id=25]
+[ext_resource path="res://Sound/double_click.wav" type="AudioStream" id=26]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends ViewportContainer
@@ -38,6 +40,8 @@ func _gui_input(event: InputEvent) -> void:
 
 [sub_resource type="DynamicFont" id=11]
 size = 40
+use_mipmaps = true
+use_filter = true
 font_data = ExtResource( 24 )
 
 [sub_resource type="GDScript" id=12]
@@ -46,6 +50,9 @@ script/source = "extends Label
 func _on_Time_visibility_changed():
 	if visible:
 		$AnimationPlayer.play(\"Show\")
+		$\"../Level\".hide()
+	else:
+		$\"../Level\".show()
 "
 
 [sub_resource type="Animation" id=13]
@@ -110,6 +117,17 @@ tracks/0/keys = {
 "values": [ Vector2( 1, 1 ) ]
 }
 
+[sub_resource type="GDScript" id=17]
+script/source = "extends TextureButton
+
+
+func _ready():
+	pressed = false
+	yield(Saver, \"loaded\")
+	
+	pressed = Saver.sound
+"
+
 [sub_resource type="GDScript" id=15]
 script/source = "extends TextureButton
 
@@ -130,15 +148,73 @@ HScrollBar/styles/grabber_pressed = SubResource( 10 )
 HScrollBar/styles/scroll = SubResource( 10 )
 HScrollBar/styles/scroll_focus = SubResource( 10 )
 
+[sub_resource type="GDScript" id=16]
+script/source = "extends Node
+
+var _get_data_cb = JavaScript.create_callback(self, \"_apply_data\")
+var _set_data_cb = JavaScript.create_callback(self, \"_saved\")
+
+var _adv
+var _paltform
+var _game
+
+func _ready() -> void:
+	logger(\"Init SDK\")
+	InstantGamesBridge.initialize()
+	InstantGamesBridge.connect(\"initalized\", self, \"_initialized\")
+
+func _initialized() -> void:
+	logger(\"Initialized\")
+	_adv = InstantGamesBridge.advertisement
+	_paltform = InstantGamesBridge.platform
+	_game = InstantGamesBridge.game
+	logger(\"ID: \" + _paltform.id)
+	logger(\"Lang: \" + _paltform.language)
+	logger(\"Payload: \" + str(_paltform.payload))
+	
+	_adv.connect(\"interstitial_state_changed\", self, \"_adv_changed\")
+	_adv.connect(\"rewarded_state_changed\", self, \"_rew_changed\")
+	
+	_adv.showInterstitial(true)
+
+
+func _adv_changed(state: String):
+	logger(\"New Inter State: \" + state)
+	
+	if state == InterstitialState.Closed:
+		_adv.showRewarded()
+
+
+func _rew_changed(state: String):
+	logger(\"New Reward State: \" + state)
+	
+	if state == RewardState.Rewarded:
+		_game.setData(\"gold\", 100, _set_data_cb)
+		_game.setData(\"name\", \"John\", _set_data_cb)
+		
+		yield(get_tree().create_timer(1.0), \"timeout\")
+		
+		_game.getData(\"gold\", _get_data_cb)
+		_game.getData(\"name\", _get_data_cb)
+
+
+func _apply_data(args) -> void:
+	logger(\"Data given: \" + str(args[0]))
+
+
+func _saved(args) -> void:
+	logger(\"Data was saved\")
+
+func logger(text):
+	$logger.add_text(text + '\\n')
+"
+
 [node name="Game" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 theme = ExtResource( 2 )
 script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 viewport = NodePath("GameWindow/Viewport")
 viewers = NodePath("Buttons/ScrollContainer/Viewers")
 
@@ -172,9 +248,9 @@ render_target_update_mode = 3
 anchor_left = 0.5
 anchor_right = 0.5
 margin_left = -64.0
-margin_top = 24.0
+margin_top = 77.0
 margin_right = 64.0
-margin_bottom = 74.0
+margin_bottom = 129.0
 custom_colors/font_color = Color( 0.498039, 0.8, 1, 1 )
 custom_colors/font_color_shadow = Color( 0.364706, 0.517647, 0.713726, 1 )
 custom_constants/shadow_offset_x = 2
@@ -183,19 +259,19 @@ custom_constants/shadow_as_outline = 0
 text = "Level 1"
 align = 1
 valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Time" type="Label" parent="."]
 modulate = Color( 1, 1, 1, 0 )
 anchor_left = 0.5
 anchor_right = 0.5
 margin_left = -64.0
-margin_top = 68.0
+margin_top = 78.0
 margin_right = 64.0
-margin_bottom = 118.0
-custom_colors/font_color = Color( 0.627451, 0.627451, 0.627451, 1 )
+margin_bottom = 128.0
+custom_colors/font_color = Color( 0.854902, 0.854902, 0.854902, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 0.513726 )
+custom_constants/shadow_offset_x = 1
+custom_constants/shadow_offset_y = 1
 custom_fonts/font = SubResource( 11 )
 text = "00:00"
 align = 1
@@ -321,9 +397,7 @@ texture_normal = ExtResource( 17 )
 texture_pressed = ExtResource( 18 )
 expand = true
 stretch_mode = 5
-__meta__ = {
-"_edit_use_anchors_": false
-}
+script = SubResource( 17 )
 
 [node name="Again" type="TextureRect" parent="."]
 anchor_left = 1.0
@@ -348,9 +422,6 @@ texture_normal = ExtResource( 4 )
 expand = true
 stretch_mode = 5
 script = SubResource( 15 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Settings" type="TextureRect" parent="."]
 visible = false
@@ -426,6 +497,12 @@ stream = ExtResource( 13 )
 stream = ExtResource( 16 )
 volume_db = 7.0
 
+[node name="DoubleClick" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 26 )
+
+[node name="Lose" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 25 )
+
 [node name="CloseController" type="Control" parent="."]
 visible = false
 anchor_right = 1.0
@@ -436,14 +513,11 @@ __meta__ = {
 
 [node name="Shop" type="Control" parent="."]
 pause_mode = 2
+anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_top = 700.0
-margin_bottom = 399.0
-rect_min_size = Vector2( 400, 400 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+margin_bottom = 200.0
+rect_min_size = Vector2( 400, 200 )
 
 [node name="TextureRect" type="ColorRect" parent="Shop"]
 anchor_right = 1.0
@@ -453,43 +527,55 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Shop" type="GridContainer" parent="Shop"]
-anchor_left = 0.5
-anchor_top = 0.034
-anchor_right = 0.5
+[node name="ScrollContainer" type="ScrollContainer" parent="Shop"]
+anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -169.0
-margin_top = 15.434
-margin_right = 169.0
-margin_bottom = -29.0
-columns = 2
-__meta__ = {
-"_edit_use_anchors_": false
-}
+margin_left = 25.0
+margin_top = 25.0
+margin_right = -25.0
+margin_bottom = -25.0
+theme = SubResource( 9 )
+scroll_vertical_enabled = false
 
-[node name="Item1" parent="Shop/Shop" instance=ExtResource( 19 )]
+[node name="Shop" type="HBoxContainer" parent="Shop/ScrollContainer"]
+margin_right = 660.0
+margin_bottom = 150.0
+custom_constants/separation = 20
+
+[node name="Item1" parent="Shop/ScrollContainer/Shop" instance=ExtResource( 19 )]
+margin_right = 150.0
+margin_bottom = 150.0
+rect_min_size = Vector2( 150, 150 )
+mouse_filter = 1
 texture_normal = ExtResource( 20 )
 pursuased = true
 asset = "Back0"
 
-[node name="Item2" parent="Shop/Shop" instance=ExtResource( 19 )]
-margin_left = 171.0
-margin_right = 338.0
+[node name="Item2" parent="Shop/ScrollContainer/Shop" instance=ExtResource( 19 )]
+margin_left = 170.0
+margin_right = 320.0
+margin_bottom = 150.0
+rect_min_size = Vector2( 150, 150 )
+mouse_filter = 1
 gold = 350
 asset = "Back2"
 
-[node name="Item3" parent="Shop/Shop" instance=ExtResource( 19 )]
-margin_top = 172.0
-margin_bottom = 340.0
+[node name="Item3" parent="Shop/ScrollContainer/Shop" instance=ExtResource( 19 )]
+margin_left = 340.0
+margin_right = 490.0
+margin_bottom = 150.0
+rect_min_size = Vector2( 150, 150 )
+mouse_filter = 1
 texture_normal = ExtResource( 21 )
 gold = 400
 asset = "Back1"
 
-[node name="Item4" parent="Shop/Shop" instance=ExtResource( 19 )]
-margin_left = 171.0
-margin_top = 172.0
-margin_right = 338.0
-margin_bottom = 340.0
+[node name="Item4" parent="Shop/ScrollContainer/Shop" instance=ExtResource( 19 )]
+margin_left = 510.0
+margin_right = 660.0
+margin_bottom = 150.0
+rect_min_size = Vector2( 150, 150 )
+mouse_filter = 1
 texture_normal = ExtResource( 22 )
 gold = 450
 asset = "Back3"
@@ -500,11 +586,21 @@ pause_mode = 2
 [node name="Message" parent="." instance=ExtResource( 23 )]
 visible = false
 
+[node name="InstantGameBridge" type="Node" parent="."]
+script = SubResource( 16 )
+
+[node name="logger" type="RichTextLabel" parent="InstantGameBridge"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_colors/default_color = Color( 0, 0, 0, 1 )
+bbcode_enabled = true
+
 [connection signal="resized" from="." to="." method="resized"]
 [connection signal="visibility_changed" from="Time" to="Time" method="_on_Time_visibility_changed"]
 [connection signal="pressed" from="Market/TextureButton" to="." method="show_show"]
 [connection signal="toggled" from="Sound/Sound" to="." method="toggle_sound"]
-[connection signal="pressed" from="Again/Again" to="." method="reload"]
+[connection signal="pressed" from="Again/Again" to="." method="reload" binds= [ true ]]
 [connection signal="pressed" from="Again/Again" to="Again/Again" method="_on_Again_pressed"]
 [connection signal="pressed" from="Settings/Settings" to="." method="settings"]
 [connection signal="gui_input" from="CloseController" to="." method="should_close"]

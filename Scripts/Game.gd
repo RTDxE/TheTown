@@ -187,6 +187,7 @@ func win():
 		emit_signal("win")
 	else:
 		emit_signal("message", "Incorrect")
+		emit_signal("sound", "Lose")
 		yield(get_tree().create_timer(1.0), "timeout")
 		emit_signal("restart")
 

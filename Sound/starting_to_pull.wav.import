@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/starting_to_pull.wav-395044d7e7700fa80392dc5ff8378427.sample"
+
+[deps]
+
+source_file="res://Sound/starting_to_pull.wav"
+dest_files=[ "res://.import/starting_to_pull.wav-395044d7e7700fa80392dc5ff8378427.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

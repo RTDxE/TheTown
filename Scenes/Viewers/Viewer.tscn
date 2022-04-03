@@ -20,9 +20,6 @@ texture_disabled = ExtResource( 4 )
 expand = true
 stretch_mode = 6
 script = ExtResource( 3 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Viewer" type="ViewportContainer" parent="."]
 anchor_right = 1.0
@@ -39,7 +36,6 @@ own_world = true
 world = SubResource( 1 )
 transparent_bg = true
 handle_input_locally = false
-msaa = 1
 render_target_update_mode = 3
 
 [node name="Viewer" type="Spatial" parent="Viewer/Viewport"]
