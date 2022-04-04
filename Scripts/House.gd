@@ -32,7 +32,7 @@ func set_decor(b):
 			colors = [1,2,3,4]
 			state = STATE.DOWN
 			translation.y = 1
-		print(colors)
+		# print(colors)
 		for blds in $Visual.get_children():
 			for bld in  blds.get_children():
 				if bld is MeshInstance:
@@ -55,7 +55,7 @@ func prepare():
 	$AnimationPlayer.play("Prepare")
 
 func anim_end(anim):
-	print("Anim end, ", anim)
+	# print("Anim end, ", anim)
 	match anim:
 		"Start", "Down":
 			state = STATE.DOWN

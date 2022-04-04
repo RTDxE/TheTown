@@ -24,7 +24,7 @@ func _init_game() -> void:
 
 
 func _inter_changed(state):
-	print("Inter state: ", state)
+	# print("Inter state: ", state)
 	get_tree().paused = state == InterstitialState.OPENED
 
 
@@ -43,7 +43,7 @@ func load_level(i=-1):
 			v.get_parent().remove_child(v)
 			v.queue_free()
 
-	$Level.text = "Level " + str(i)
+	$Level.text = tr("KEY_LEVEL") + " " + str(i)
 	
 	var res = Levels.get_scene(i)
 	for v in res.buildings:
@@ -85,18 +85,18 @@ func update_money():
 func next_level():
 	Saver.level += 1
 	if Saver.level > Levels.levels.size():
-		print("End of game, level 1")
+		# print("End of game, level 1")
 		Saver.level = 1
 	load_level()
 	
-	print("next level ", Saver.level)
+	# print("next level ", Saver.level)
 
 func reload(with_sound = false) -> void:
 	if with_sound:
 		sound("DoubleClick")
 	game.is_dragging = false
 	load_level()
-	print("reload level ", Saver.level)
+	# print("reload level ", Saver.level)
 
 
 func settings() -> void:
@@ -104,7 +104,7 @@ func settings() -> void:
 
 
 func toggle_sound(b) -> void:
-	print("Audio")
+	# print("Audio")
 	if game != null:
 		game.is_dragging = false
 		Saver.sound = b
@@ -115,8 +115,8 @@ var shop_opened = false
 func show_show():
 	shop_opened = not shop_opened
 	if shop_opened:
-		print("shop pos: ", $Shop.rect_position.y)
-		print("shop size: ", $Shop.rect_size.y)
+		# print("shop pos: ", $Shop.rect_position.y)
+		# print("shop size: ", $Shop.rect_size.y)
 		$Shop.rect_size.x = rect_size.x
 		$ShopTween.interpolate_property(
 			$Shop, "rect_position:y",

@@ -90,9 +90,10 @@ func terrain_tapped(vec : Vector3, real: Vector3):
 #	house.start()
 
 func pick(mask=1):
-	var mouse_pos = get_viewport().get_mouse_position()
+	var r = get_viewport().size / OS.window_size
+	var mouse_pos = get_viewport().get_mouse_position() * r
 	var from = camera.project_ray_origin(mouse_pos)
-	var to = from + camera.project_ray_normal(mouse_pos) * 1000
+	var to = from + camera.project_ray_normal(mouse_pos) * 10000
 	var space_state = get_world().direct_space_state
 	return space_state.intersect_ray(from, to, [], mask)
 
@@ -163,7 +164,7 @@ func win():
 		elif f_place_time * 1.5 * 1.5 >= game_time:
 			x = 2
 		if x > 1:
-			emit_signal("message", "TIME BONUS X" + str(x))
+			emit_signal("message", "%s X%d" % [tr("KEY_TIME_BONUS"), x])
 		var particles_arr = []
 		for cell in terrain.get_all():
 			var particles = particles_inst.instance()
@@ -186,7 +187,7 @@ func win():
 		yield(t, "timeout")
 		emit_signal("win")
 	else:
-		emit_signal("message", "Incorrect")
+		emit_signal("message", tr("KEY_INCORRECT"))
 		emit_signal("sound", "Lose")
 		yield(get_tree().create_timer(1.0), "timeout")
 		emit_signal("restart")
@@ -276,7 +277,7 @@ func _unhandled_input(event):
 #					selected.update_markers(markers)
 #					click = 0
 		elif is_dragging:
-			print("click")
+			#print("click")
 			is_dragging = false
 #			var result_house = pick(2)
 			var result = pick(4)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=2]
+[gd_scene load_steps=40 format=2]
 
 [ext_resource path="res://Scripts/Main.gd" type="Script" id=1]
 [ext_resource path="res://Themes/Base.tres" type="Theme" id=2]
@@ -7,7 +7,7 @@
 [ext_resource path="res://Images/ButtonFlip.png" type="Texture" id=5]
 [ext_resource path="res://Images/money.png" type="Texture" id=6]
 [ext_resource path="res://Images/Gear.png" type="Texture" id=7]
-[ext_resource path="res://Sound/bgm.ogg" type="AudioStream" id=8]
+[ext_resource path="res://Sound/Piano in D Minor (12_27_21).ogg" type="AudioStream" id=8]
 [ext_resource path="res://Images/market.png" type="Texture" id=9]
 [ext_resource path="res://Images/ButtonLeftSmal.png" type="Texture" id=10]
 [ext_resource path="res://Images/Button.png" type="Texture" id=11]
@@ -26,6 +26,7 @@
 [ext_resource path="res://Fonts/MontserratAlternates-Thin.ttf" type="DynamicFontData" id=24]
 [ext_resource path="res://Sound/lose.wav" type="AudioStream" id=25]
 [ext_resource path="res://Sound/double_click.wav" type="AudioStream" id=26]
+[ext_resource path="res://Fonts/Montserrat-Regular.ttf" type="DynamicFontData" id=27]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends ViewportContainer
@@ -37,6 +38,12 @@ func _gui_input(event: InputEvent) -> void:
 		pass
 	$Viewport.unhandled_input(event)
 "
+
+[sub_resource type="DynamicFont" id=18]
+size = 32
+use_mipmaps = true
+use_filter = true
+font_data = ExtResource( 27 )
 
 [sub_resource type="DynamicFont" id=11]
 size = 40
@@ -173,12 +180,10 @@ anchor_bottom = 1.0
 size_flags_vertical = 3
 stretch = true
 script = SubResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Viewport" type="Viewport" parent="GameWindow"]
-size = Vector2( 400, 700 )
+size = Vector2( 540, 960 )
+size_override_stretch = true
 transparent_bg = true
 handle_input_locally = false
 render_target_update_mode = 3
@@ -186,15 +191,16 @@ render_target_update_mode = 3
 [node name="Level" type="Label" parent="."]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -64.0
-margin_top = 77.0
-margin_right = 64.0
-margin_bottom = 129.0
+margin_left = -142.0
+margin_top = 39.0
+margin_right = 143.0
+margin_bottom = 107.0
 custom_colors/font_color = Color( 0.498039, 0.8, 1, 1 )
 custom_colors/font_color_shadow = Color( 0.364706, 0.517647, 0.713726, 1 )
 custom_constants/shadow_offset_x = 2
 custom_constants/shadow_offset_y = 2
 custom_constants/shadow_as_outline = 0
+custom_fonts/font = SubResource( 18 )
 text = "Level 1"
 align = 1
 valign = 1
@@ -204,9 +210,9 @@ modulate = Color( 1, 1, 1, 0 )
 anchor_left = 0.5
 anchor_right = 0.5
 margin_left = -64.0
-margin_top = 78.0
+margin_top = 49.0
 margin_right = 64.0
-margin_bottom = 128.0
+margin_bottom = 99.0
 custom_colors/font_color = Color( 0.854902, 0.854902, 0.854902, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 0.513726 )
 custom_constants/shadow_offset_x = 1
@@ -216,9 +222,6 @@ text = "00:00"
 align = 1
 valign = 1
 script = SubResource( 12 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Time"]
 anims/RESET = SubResource( 13 )
@@ -434,13 +437,15 @@ stream = ExtResource( 13 )
 
 [node name="Build" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 16 )
-volume_db = 7.0
+volume_db = -5.0
 
 [node name="DoubleClick" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 26 )
 
 [node name="Lose" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 25 )
+volume_db = -7.0
+pitch_scale = 0.8
 
 [node name="CloseController" type="Control" parent="."]
 visible = false

@@ -144,7 +144,8 @@ func _l_rel(count = 1):
 func _load_standalone() -> void:
 	var config = ConfigFile.new()
 	if config.load("user://data.save") != OK:
-		print("No save. Load default")
+		pass
+		# print("No save. Load default")
 	
 	_money = config.get_value("Data", "money", 0)
 	_level = config.get_value("Data", "level", 1)

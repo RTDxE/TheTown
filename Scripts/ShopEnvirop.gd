@@ -28,6 +28,6 @@ func update_status():
 	$Build.visible = Saver.current_background == asset
 
 func resized() -> void:
-	print("resized")
+	# print("resized")
 	if rect_size.y < 150:
 		$Money/Count.add_font_override("font", preload("res://Fonts/Big.tres"))
